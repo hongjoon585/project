@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lunch-app-back-deployment
+  namespace: back-ns
+  labels:
+    app: lunch-app-back
+    tier: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: lunch-app-back
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: lunch-app-back
+        tier: backend
+    spec:
+      imagePullSecrets:
+      - name: private-reg-secret
+      volumes:
+      - name: logs-shared-volume
+        emptyDir: {}
+      containers:
+      - name: lunch-app-back
+        image: 192.168.0.220/lunchapp/lunch-app-back:1.0
+        ports:
+        - containerPort: 4000
+        envFrom:
+        - configMapRef:
+            name: lunch-app-config
+        - secretRef:
+            name: lunch-app-secrets
+        volumeMounts:
+        - name: logs-shared-volume
+          mountPath: /var/log/app
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lunch-app-back-service
+  namespace: back-ns
+  labels:
+    app: lunch-app-back
+    tier: backend
+spec:
+  type: ClusterIP
+  ports:
+  - port: 4000
+    targetPort: 4000
+    protocol: TCP
+  selector:
+    app: lunch-app-back
+    tier: backend
+

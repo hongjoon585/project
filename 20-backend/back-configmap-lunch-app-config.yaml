@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lunch-app-config
+  namespace: back-ns
+  labels:
+    app: lunch-app
+data:
+  BACK_PORT: "4000"
+  FRONT_PORT: "3000"
+  BACKEND_API_HOST: "http://lunch-app-back-service.back-ns:4000"
+  config.json: |
+    {
+      "backendBaseUrl": "http://lunch-app-back-service.back-ns:4000"
+    }
+  MONGO_HOST: "mongo-db-service.db-ns"
+  MONGO_PORT: "27017"
+  MONGO_DB_NAME: "app"
+  MONGO_AUTH_SOURCE: "admin"
+

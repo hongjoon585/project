@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lunch-app-front-deployment
+  namespace: front-ns
+  labels:
+    app: lunch-app
+    tier: frontend
+    version: v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lunch-app
+      tier: frontend
+  template:
+    metadata:
+      labels:
+        app: lunch-app
+        tier: frontend
+        version: v1
+    spec:
+      imagePullSecrets:
+      - name: private-reg-secret
+      containers:
+      - name: lunch-app-front
+        image: 192.168.0.220/lunchapp/lunch-app-front:1.0
+        ports:
+        - containerPort: 3000
+        env:
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: lunch-app-config
+              key: FRONT_PORT
+        - name: API_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: lunch-app-config
+              key: BACKEND_API_HOST
+        - name: SESSION_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: lunch-app-secrets
+              key: SESSION_SECRET_FRONT
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: lunch-app-secrets
+              key: JWT_SECRET
+        volumeMounts:
+        - name: front-config-volume
+          mountPath: /app/config
+          readOnly: true
+      volumes:
+      - name: front-config-volume
+        configMap:
+          name: lunch-app-config
+          items:
+          - key: config.json
+            path: config.json
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lunch-app-front-service
+  namespace: front-ns
+  labels:
+    app: lunch-app
+    tier: frontend
+spec:
+  type: NodePort
+  ports:
+  - port: 80           # 클러스터 내부 포트
+    targetPort: 3000   # 컨테이너 포트
+    nodePort: 30080    # 노드에서 여는 포트
+    protocol: TCP
+  selector:
+    app: lunch-app
+    tier: frontend
+
