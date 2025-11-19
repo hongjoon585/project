@@ -9,8 +9,8 @@ metadata:
 spec:
   clusterIP: None
   ports:
-  - port: 27017
-    targetPort: 27017
+    - port: 27017
+      targetPort: 27017
   selector:
     app: lunch-app
     tier: database
@@ -37,41 +37,32 @@ spec:
         tier: database
     spec:
       imagePullSecrets:
-      - name: private-reg-secret
+        - name: private-reg-secret
       containers:
-      - name: mongo
-        image: 192.168.0.220/lunchapp/mongo:7.0   # Harbor 경로 유지
-        ports:
-        - containerPort: 27017
-        command: ["mongod", "--bind_ip_all"]
-        env:
-        - name: MONGO_INITDB_DATABASE
-          value: "app"
-        - name: MONGO_INITDB_ROOT_USERNAME
-          valueFrom:
-            secretKeyRef:
-              name: lunch-app-secrets
-              key: MONGO_ROOT_USER
-        - name: MONGO_INITDB_ROOT_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: lunch-app-secrets
-              key: MONGO_ROOT_PASS
-        volumeMounts:
+        - name: mongo
+          image: 192.168.0.220/lunchapp/mongo:7.0   # Harbor 경로 유지
+          ports:
+            - containerPort: 27017
+          command: ["mongod", "--bind_ip_all"]
+          env:
+            - name: MONGO_INITDB_DATABASE
+              value: "app"
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: lunch-app-secrets
+                  key: MONGO_ROOT_USER
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: lunch-app-secrets
+                  key: MONGO_ROOT_PASS
+          volumeMounts:
+            - name: mongo-data
+              mountPath: /data/db
+      volumes:
         - name: mongo-data
-          mountPath: /data/db
-  volumeClaimTemplates:
-  - metadata:
-      name: mongo-data
-      labels:
-        app: lunch-app
-        tier: database
-    spec:
-      accessModes: ["ReadWriteOnce"]
-      storageClassName: openebs-hostpath
-      resources:
-        requests:
-          storage: 10Gi
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
@@ -84,9 +75,9 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - port: 27017
-    targetPort: 27017
-    protocol: TCP
+    - port: 27017
+      targetPort: 27017
+      protocol: TCP
   selector:
     app: lunch-app
     tier: database
