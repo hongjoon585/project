@@ -7,7 +7,7 @@ metadata:
   name: monitoring
 ---
 # ----------------------------------------------------
-# 2) Prometheus ConfigMap (Jenkins + Prometheus scrape)
+# 2) Prometheus ConfigMap (Jenkins + ArgoCD + Prometheus)
 # ----------------------------------------------------
 apiVersion: v1
 kind: ConfigMap
@@ -20,16 +20,37 @@ data:
       scrape_interval: 15s
 
     scrape_configs:
+      # ---------------------------------------------
       # Prometheus 자체 모니터링
+      # ---------------------------------------------
       - job_name: 'prometheus'
         static_configs:
           - targets: ['localhost:9090']
 
+      # ---------------------------------------------
       # Jenkins 모니터링
+      # ---------------------------------------------
       - job_name: 'jenkins'
         metrics_path: /prometheus
         static_configs:
-          - targets: ['192.168.0.219:8080']   # ← Jenkins IP:PORT 반드시 확인
+          - targets: ['192.168.0.219:8080']   # Jenkins Docker 호스트 IP:PORT
+
+      # ---------------------------------------------
+      # Argo CD 모니터링
+      # (ArgoCD Server Metrics)
+      # ---------------------------------------------
+      - job_name: 'argocd-server'
+        metrics_path: /metrics
+        static_configs:
+          - targets: ['argocd-server-metrics.argocd.svc.cluster.local:8083']
+
+      # ---------------------------------------------
+      # Argo CD Application Controller 모니터링
+      # ---------------------------------------------
+      - job_name: 'argocd-controller'
+        metrics_path: /metrics
+        static_configs:
+          - targets: ['argocd-metrics.argocd.svc.cluster.local:8082']
 ---
 # ----------------------------------------------------
 # 3) Prometheus Deployment
