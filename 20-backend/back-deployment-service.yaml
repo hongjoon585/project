@@ -25,7 +25,7 @@ spec:
         emptyDir: {}
       containers:
       - name: lunch-app-back
-        image: 192.168.0.220/lunchapp/lunch-app-back:1.0
+        image: 192.168.0.220/lunchapp/back-ci:latest
         ports:
         - containerPort: 4000
         envFrom:
