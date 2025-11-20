@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: db-allow-from-back
+  namespace: db-ns
+spec:
+  # mongo StatefulSet / Pod 라벨
+  podSelector:
+    matchLabels:
+      app: mongo
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    # 1) 같은 db-ns 안의 Pod 들 허용
+    - podSelector: {}
+
+    # 2) back-ns 의 백엔드 Pod 허용
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: back-ns
+      podSelector:
+        matchLabels:
+          app: lunch-app-back
+          tier: backend
+

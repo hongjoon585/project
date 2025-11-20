@@ -1,0 +1,27 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: back-allow-from-front
+  namespace: back-ns
+spec:
+  # 이 정책이 적용될 백엔드 Pod 선택
+  podSelector:
+    matchLabels:
+      app: lunch-app-back      # << back-deployment 라벨 그대로
+      tier: backend
+  policyTypes:
+  - Ingress
+  ingress:
+  - from:
+    # 1) 같은 back-ns 안의 Pod 들은 허용 (자기 자신, sidecar 등)
+    - podSelector: {}
+
+    # 2) front-ns 의 프론트엔드 Pod 허용
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: front-ns
+      podSelector:
+        matchLabels:
+          app: lunch-app       # << front-deployment 라벨
+          tier: frontend
+
