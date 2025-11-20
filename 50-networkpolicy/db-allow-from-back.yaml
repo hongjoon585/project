@@ -4,19 +4,18 @@ metadata:
   name: db-allow-from-back
   namespace: db-ns
 spec:
-  # ✅ 실제 mongo-0 Pod 라벨과 맞춤
+  # ❌ mongo Pod 라벨과 일부러 안 맞게 설정 (app=mongo 라고 틀리게 적어둠)
   podSelector:
     matchLabels:
-      app: lunch-app
-      tier: database
+      app: mongo
   policyTypes:
   - Ingress
   ingress:
   - from:
-    # 1) 같은 db-ns 안의 Pod 들 허용 (필요에 따라 옵션)
+    # 1) 같은 db-ns 안의 Pod 들 허용
     - podSelector: {}
 
-    # 2) back-ns 의 백엔드 Pod 허용 (백엔드만 DB 접근 가능)
+    # 2) back-ns 의 백엔드 Pod 허용 (여긴 그럴듯하게 보이지만, 위 podSelector가 틀려서 전체 무효 상태)
     - namespaceSelector:
         matchLabels:
           kubernetes.io/metadata.name: back-ns
