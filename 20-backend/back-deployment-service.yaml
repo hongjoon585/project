@@ -25,7 +25,7 @@ spec:
         emptyDir: {}
       containers:
       - name: lunch-app-back
-        image: 192.168.0.220/lunchapp/back-ci:35
+        image: 192.168.0.220/lunchapp/back-ci:36
         ports:
         - containerPort: 4000
         # 기존처럼 ConfigMap/Secret도 그대로 사용
