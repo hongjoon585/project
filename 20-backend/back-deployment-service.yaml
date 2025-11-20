@@ -28,11 +28,20 @@ spec:
         image: 192.168.0.220/lunchapp/back-ci:34
         ports:
         - containerPort: 4000
+        # 기존처럼 ConfigMap/Secret도 그대로 사용
         envFrom:
         - configMapRef:
             name: lunch-app-config
         - secretRef:
             name: lunch-app-secrets
+        # ⬇ 여기서부터 Mongo URL 을 "무인증"으로 강제 덮어쓰기
+        env:
+        - name: MONGO_URL
+          value: mongodb://mongo-db-service.db-ns:27017/app
+        - name: MONGO_URI
+          value: mongodb://mongo-db-service.db-ns:27017/app
+        - name: MONGODB_URI
+          value: mongodb://mongo-db-service.db-ns:27017/app
         volumeMounts:
         - name: logs-shared-volume
           mountPath: /var/log/app
