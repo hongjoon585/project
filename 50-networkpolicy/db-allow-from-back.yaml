@@ -4,18 +4,18 @@ metadata:
   name: db-allow-from-back
   namespace: db-ns
 spec:
-  # mongo StatefulSet / Pod 라벨
   podSelector:
     matchLabels:
-      app: mongo
+      app: lunch-app        # 실제 mongo-0 라벨
+      tier: database
   policyTypes:
   - Ingress
   ingress:
   - from:
-    # 1) 같은 db-ns 안의 Pod 들 허용
+    # 같은 db-ns 안 Pod 허용 (필요 없으면 지워도 됨)
     - podSelector: {}
 
-    # 2) back-ns 의 백엔드 Pod 허용
+    # back-ns 의 백엔드 Pod 허용
     - namespaceSelector:
         matchLabels:
           kubernetes.io/metadata.name: back-ns
@@ -23,4 +23,7 @@ spec:
         matchLabels:
           app: lunch-app-back
           tier: backend
+    ports:
+    - protocol: TCP
+      port: 27017
 
