@@ -24,7 +24,7 @@ spec:
       - name: private-reg-secret
       containers:
       - name: lunch-app-front
-        image: 192.168.0.220/lunchapp/front-ci:32
+        image: 192.168.0.220/lunchapp/front-ci:33
         ports:
         - containerPort: 3000
         env:
